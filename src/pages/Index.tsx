@@ -5,6 +5,9 @@ import { WebcamInput } from '@/components/WebcamInput';
 import { ImageUploadInput } from '@/components/ImageUploadInput';
 import { FacialFeatureControls } from '@/components/FacialFeatureControls';
 import { EmotionDashboard } from '@/components/EmotionDashboard';
+import { EmotionHistory } from '@/components/EmotionHistory';
+import { AnimatedFace } from '@/components/AnimatedFace';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { analyzeEmotion } from '@/lib/emotionEngine';
 import { FacialFeatures, InputMode, EmotionResult } from '@/lib/types';
 
@@ -17,14 +20,15 @@ const Index = () => {
   });
   const [result, setResult] = useState<EmotionResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [history, setHistory] = useState<EmotionResult[]>([]);
 
   const runAnalysis = useCallback(() => {
     setIsAnalyzing(true);
     setResult(null);
-    // Simulated processing delay
     setTimeout(() => {
       const res = analyzeEmotion(features);
       setResult(res);
+      setHistory((prev) => [...prev, res]);
       setIsAnalyzing(false);
     }, 1200);
   }, [features]);
@@ -44,25 +48,30 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Mode toggle */}
-          <div className="flex items-center bg-secondary rounded-lg p-1 border border-border">
-            {([
-              { id: 'webcam' as InputMode, label: 'Webcam', icon: Camera },
-              { id: 'upload' as InputMode, label: 'Upload', icon: ImageIcon },
-            ]).map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setMode(m.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                  mode === m.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <m.icon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{m.label}</span>
-              </button>
-            ))}
+          <div className="flex items-center gap-3">
+            {/* Mode toggle */}
+            <div className="flex items-center bg-secondary rounded-lg p-1 border border-border">
+              {([
+                { id: 'webcam' as InputMode, label: 'Webcam', icon: Camera },
+                { id: 'upload' as InputMode, label: 'Upload', icon: ImageIcon },
+              ]).map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setMode(m.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    mode === m.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <m.icon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{m.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Theme toggle */}
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -90,6 +99,18 @@ const Index = () => {
               </AnimatePresence>
             </motion.div>
 
+            {/* Animated face preview */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass rounded-xl p-5"
+            >
+              <h3 className="text-sm font-semibold text-primary font-mono tracking-wider uppercase mb-3">
+                Feature Preview
+              </h3>
+              <AnimatedFace features={features} />
+            </motion.div>
+
             {/* Feature controls */}
             <FacialFeatureControls features={features} onChange={setFeatures} />
 
@@ -106,9 +127,10 @@ const Index = () => {
             </motion.button>
           </div>
 
-          {/* Right column — results */}
-          <div>
+          {/* Right column — results + history */}
+          <div className="space-y-6">
             <EmotionDashboard result={result} isAnalyzing={isAnalyzing} />
+            <EmotionHistory history={history} />
           </div>
         </div>
 

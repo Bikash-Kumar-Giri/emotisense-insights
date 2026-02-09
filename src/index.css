@@ -6,6 +6,56 @@
 
 @layer base {
   :root {
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 185 72% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 222 30% 20%;
+
+    --muted: 220 14% 95%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 185 40% 92%;
+    --accent-foreground: 185 72% 30%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 87%;
+    --input: 220 13% 87%;
+    --ring: 185 72% 38%;
+
+    --radius: 0.75rem;
+
+    --emotion-happy: 45 93% 50%;
+    --emotion-sad: 215 70% 50%;
+    --emotion-angry: 0 78% 50%;
+    --emotion-neutral: 220 15% 50%;
+    --emotion-anxious: 280 60% 55%;
+
+    --glow-primary: 185 72% 38%;
+    --glow-intensity: 0.08;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 185 72% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 185 40% 92%;
+    --sidebar-accent-foreground: 185 72% 30%;
+    --sidebar-border: 220 13% 87%;
+    --sidebar-ring: 185 72% 38%;
+  }
+
+  .dark {
     --background: 222 47% 6%;
     --foreground: 210 40% 92%;
 
@@ -34,16 +84,12 @@
     --input: 222 30% 18%;
     --ring: 185 72% 48%;
 
-    --radius: 0.75rem;
-
-    /* Emotion colors */
     --emotion-happy: 45 93% 58%;
     --emotion-sad: 215 70% 55%;
     --emotion-angry: 0 78% 58%;
     --emotion-neutral: 220 15% 55%;
     --emotion-anxious: 280 60% 60%;
 
-    /* Glow effects */
     --glow-primary: 185 72% 48%;
     --glow-intensity: 0.15;
 
