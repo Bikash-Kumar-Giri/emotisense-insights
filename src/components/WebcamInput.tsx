@@ -11,35 +11,57 @@ export function WebcamInput() {
   const startWebcam = useCallback(async () => {
     try {
       setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        // Ensure playback starts
+        try {
+          await videoRef.current.play();
+        } catch {
+          // autoplay may handle it
+        }
       }
       setIsActive(true);
-    } catch {
-      setError('Unable to access webcam. Please grant camera permissions.');
+    } catch (err) {
+      console.error('Webcam error:', err);
+      setError('Unable to access webcam. Please grant camera permissions and ensure no other app is using it.');
     }
   }, []);
 
   const stopWebcam = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop());
     streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setIsActive(false);
   }, []);
 
-  useEffect(() => () => { streamRef.current?.getTracks().forEach(t => t.stop()); }, []);
+  useEffect(() => () => {
+    streamRef.current?.getTracks().forEach(t => t.stop());
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative w-full max-w-md aspect-[4/3] rounded-lg overflow-hidden bg-secondary border border-border">
+        {/* Always render the video element so ref is available */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`w-full h-full object-cover ${isActive ? 'block' : 'hidden'}`}
+        />
+
         <AnimatePresence>
           {isActive ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-              <div className="absolute inset-0 pointer-events-none border-2 border-primary/30 rounded-lg" />
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 pointer-events-none">
+              <div className="absolute inset-0 border-2 border-primary/30 rounded-lg" />
+              <div className="absolute inset-0 overflow-hidden rounded-lg">
                 <div className="scan-line w-full h-1/3" />
               </div>
               <div className="absolute top-3 left-3 flex items-center gap-2">
