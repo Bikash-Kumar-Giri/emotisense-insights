@@ -3,35 +3,40 @@ import { Camera, ImageIcon, Scan, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WebcamInput } from '@/components/WebcamInput';
 import { ImageUploadInput } from '@/components/ImageUploadInput';
-import { FacialFeatureControls } from '@/components/FacialFeatureControls';
 import { EmotionDashboard } from '@/components/EmotionDashboard';
 import { EmotionHistory } from '@/components/EmotionHistory';
-import { AnimatedFace } from '@/components/AnimatedFace';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { analyzeEmotion } from '@/lib/emotionEngine';
-import { FacialFeatures, InputMode, EmotionResult } from '@/lib/types';
+import { FacialFeatures, InputMode, EmotionResult, EyeState, MouthShape, EyebrowPosition } from '@/lib/types';
 
 const Index = () => {
   const [mode, setMode] = useState<InputMode>('webcam');
-  const [features, setFeatures] = useState<FacialFeatures>({
-    eyeState: 'open',
-    mouthShape: 'neutral',
-    eyebrowPosition: 'normal',
-  });
   const [result, setResult] = useState<EmotionResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [history, setHistory] = useState<EmotionResult[]>([]);
+
+  const randomFeatures = (): FacialFeatures => {
+    const eyes: EyeState[] = ['open', 'relaxed', 'tense'];
+    const mouths: MouthShape[] = ['smile', 'neutral', 'frown'];
+    const brows: EyebrowPosition[] = ['raised', 'normal', 'furrowed'];
+    return {
+      eyeState: eyes[Math.floor(Math.random() * eyes.length)],
+      mouthShape: mouths[Math.floor(Math.random() * mouths.length)],
+      eyebrowPosition: brows[Math.floor(Math.random() * brows.length)],
+    };
+  };
 
   const runAnalysis = useCallback(() => {
     setIsAnalyzing(true);
     setResult(null);
     setTimeout(() => {
+      const features = randomFeatures();
       const res = analyzeEmotion(features);
       setResult(res);
       setHistory((prev) => [...prev, res]);
       setIsAnalyzing(false);
     }, 1200);
-  }, [features]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,21 +103,6 @@ const Index = () => {
                 )}
               </AnimatePresence>
             </motion.div>
-
-            {/* Animated face preview */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass rounded-xl p-5"
-            >
-              <h3 className="text-sm font-semibold text-primary font-mono tracking-wider uppercase mb-3">
-                Feature Preview
-              </h3>
-              <AnimatedFace features={features} />
-            </motion.div>
-
-            {/* Feature controls */}
-            <FacialFeatureControls features={features} onChange={setFeatures} />
 
             {/* Analyze button */}
             <motion.button
